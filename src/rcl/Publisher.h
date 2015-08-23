@@ -38,8 +38,7 @@
 #include "msg.h"
 #include <stdlib.h>
 #include <string.h>
-#include "TopicWriter.h"
-#include "XMLRPCServer.h"
+#include "rmw.h"
 //#define QUEUE_MSG_SIZE 128
 extern "C" void tr_publish(void*,void*);
 namespace ros {
@@ -58,13 +57,18 @@ public:
 		++publisherCount;
 	    strcpy(this->topic, topic);
 	    T msg;
-	    tw = XMLRPCServer::registerPublisher(node->name, topic, msg.getType());
+        dw = RMW::instance()->addDataWriter(topic, node->name, msg.getType());
+
+        if (dw == NULL)
+            os_printf("DW is NULL!!\n");
+        else
+            os_printf("dw topic: %s\n", dw->getTopic());
 	}
     void publish(const Msg&);
 private:
     char topic[32];
     Node* node;
-    TopicWriter* tw;
+    DataWriter* dw;
     static unsigned int publisherCount;
 };
 

@@ -15,7 +15,6 @@ extern "C"
 #include "Subscriber.h"
 #include "Publisher.h"
 
-#include <XMLRPCServer.h>
 #include <nodes.h>
 
 #include "wiring.h"
@@ -26,7 +25,7 @@ void InitNodesTask(void* params)
 	unsigned int num_nodes = sizeof(nodes)/sizeof(node_decriptor);
 	for (unsigned int i=0; i< num_nodes; i++)
 	{
-		xTaskCreate(nodes[i].function, (const signed char*)nodes[i].name, configMINIMAL_STACK_SIZE*4, NULL, tskIDLE_PRIORITY + 4, NULL);
+        xTaskCreate(nodes[i].function, (const signed char*)nodes[i].name, configMINIMAL_STACK_SIZE*4, NULL, tskIDLE_PRIORITY + 3, NULL);
 	}
 
 
@@ -149,17 +148,30 @@ void highLoadTask( void *pvParameters )
 }
 
 extern "C" void TerminalTask(void*);
+#include "rmw.h"
+
+void rmw_main(void*p)
+{
+    RMW::instance()->start();
+
+    for(;;)
+    {
+        vTaskDelay(1000);
+    }
+}
 
 void ros_main(void* p)
 {
-	//xTaskCreate( Monitor, (const signed char*)"load", TSK_Monitor_STACK_SIZE, NULL, TSK_monitor_PRIO, NULL);
+    //xTaskCreate( Monitor, (const signed char*)"load", TSK_Monitor_STACK_SIZE, NULL, TSK_monitor_PRIO, NULL);
 	xTaskCreate(TerminalTask, (const signed char*)"TerminalTask", 128, NULL, tskIDLE_PRIORITY + 2, NULL);
-	enableTiming();
-	// TODO: Why is this delay necessary? Put a signaling mechanism instead, if the tasks below have to wait for some initialization.
-	vTaskDelay(4000);
-	XMLRPCServer::start();
-	//xTaskCreate(highLoadTask, (const signed char*)"HighLoadTask", 128, NULL, tskIDLE_PRIORITY + 3, NULL);
 
+	// TODO: Why is this delay necessary? Put a signaling mechanism instead, if the tasks below have to wait for some initialization.
+    vTaskDelay(4000);
+
+    xTaskCreate(rmw_main, (const signed char*)"RMW", 1024, NULL, tskIDLE_PRIORITY + 2, NULL);
+
+	//xTaskCreate(highLoadTask, (const signed char*)"HighLoadTask", 128, NULL, tskIDLE_PRIORITY + 3, NULL);
+    vTaskDelay(5000);
     xTaskCreate(InitNodesTask, (const signed char*)"InitNodesTask", 128, NULL, tskIDLE_PRIORITY + 2, NULL);
 
     vTaskDelete(NULL);
