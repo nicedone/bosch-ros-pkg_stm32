@@ -26,9 +26,9 @@ void InitNodesTask(void* params)
 	for (unsigned int i=0; i< num_nodes; i++)
 	{
 #ifdef DEADLINE_SCHEDULING
-        xDeadlineTaskCreate(nodes[i].function, (const signed char*)nodes[i].name, configMINIMAL_STACK_SIZE*4, NULL, nodes[i].deadline, NULL);
+        xDeadlineTaskCreate(nodes[i].function, (const signed char*)nodes[i].name, configMINIMAL_STACK_SIZE*8, NULL, nodes[i].deadline, NULL);
 #else
-        xTaskCreate(nodes[i].function, (const signed char*)nodes[i].name, configMINIMAL_STACK_SIZE*4, NULL, tskIDLE_PRIORITY + 4UL , NULL);
+        xTaskCreate(nodes[i].function, (const signed char*)nodes[i].name, configMINIMAL_STACK_SIZE*8, NULL, tskIDLE_PRIORITY + 4UL , NULL);
 #endif
     }
 

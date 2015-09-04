@@ -28,7 +28,7 @@ void DataWriter::publishMsg(const ros::Msg& msg)
     uint32_t offset = msg.serialize(stream+sizeof(Connection)+sizeof(msgHeader)+sizeof(uint32_t));
     memcpy(stream+sizeof(Connection)+sizeof(msgHeader), &offset, sizeof(uint32_t));
 
-    ipcSend((const char*)stream+sizeof(Connection)+sizeof(msgHeader)+sizeof(uint32_t), topic);
+    ipcSend((const char*)stream+sizeof(Connection)+sizeof(msgHeader), topic);
 
     if (lastConnectionID >=0)
     for (long connectionID = 0; connectionID <= lastConnectionID; connectionID++)

@@ -6,6 +6,8 @@
 #include "task.h"
 #include "semphr.h"
 
+#define MSG_LEN 400
+
 class DataReader
 {
 	char topic[MAX_TOPIC_LEN];
@@ -16,7 +18,7 @@ class DataReader
     uint32_t connectionID;
 	xQueueHandle qHandle;
 
-	static const int RX_QUEUE_MSG_SIZE = 128;
+    static const int RX_QUEUE_MSG_SIZE = MSG_LEN;
 	static const int MAX_CALLBACKS = 5;
 
 	void(*callbacks[MAX_CALLBACKS])(void* data, void* obj);
