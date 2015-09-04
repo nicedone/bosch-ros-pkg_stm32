@@ -45,7 +45,7 @@ Publisher::Publisher()
 
 void Publisher::publish(const Msg& msg)
 {
-	tw->publishMsg(msg);
+    dw->publishMsg(msg);
 	//digitalWrite(GPIO_PD11, HIGH);
 }
 

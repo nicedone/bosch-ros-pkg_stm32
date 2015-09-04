@@ -15,7 +15,7 @@ Publisher* new_pub;
 void newLoop()
 {
     static int counter=0;
-    for (volatile int i = 0; i< 30000; i++);
+    for (volatile int i = 0; i< 300; i++);
     Int32 msg;
     msg.data = counter++;
     new_pub->publish(msg);

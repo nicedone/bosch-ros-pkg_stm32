@@ -28,6 +28,7 @@ void ultrasonicLoop()
     {
         msg.range = distance_m;
         ultrasonic_pub->publish(msg);
+        os_printf("Ultra:%d\n", (int)(distance_m*1000));
     }
     LOG("Publish");
 }

@@ -38,8 +38,7 @@
 #include "Node.h"
 #include <string.h>
 #include <stdio.h>
-#include <TopicReader.h>
-#include <XMLRPCServer.h>
+#include <rmw.h>
 
 // TODO: Why does STM32 crash if max_subscribers>=20? Not enough memory?
 #define MAX_SUBSCRIBERS 10
@@ -77,9 +76,9 @@ namespace ros {
     	  topic = topic_name;
     	  list[++lastSubscriberIndex] = this;
 
-  		TopicReader* tr = XMLRPCServer::registerSubscriber(node->name, topic, msg.getMD5(), msg.getType());
+        DataReader* dr = RMW::instance()->addDataReader(node->name, topic, msg.getMD5(), msg.getType());
   		this->callback = cb;
-  		tr->addCallback(subCallback, this);
+        dr->addCallback(subCallback, this);
       };
 
   	static void subCallback(void* data, void* obj)
