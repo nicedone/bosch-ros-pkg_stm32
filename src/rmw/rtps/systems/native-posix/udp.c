@@ -15,6 +15,7 @@
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include "device_config.h"
+#include "lwip/ip.h"
 
 #define in_addr_t uint32_t
 #define in_port_t uint16_t
@@ -70,6 +71,9 @@ bool frudp_init()
     FREERTPS_FATAL("couldn't create tx sock\n");
     return false;
   }
+
+  netif_list->flags |= NETIF_FLAG_IGMP;
+
   int result;
   result = setsockopt(g_frudp_tx_sock, IPPROTO_IP, IP_MULTICAST_IF,
                       (char *)&g_frudp_tx_addr.sin_addr.s_addr,
@@ -183,13 +187,13 @@ bool frudp_add_mcast_rx(in_addr_t group, uint16_t port) //,
   if (s < 0)
     return false;
   int result = 0, reuseaddr = 1;
-  result = setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
+  /*result = setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
                       &reuseaddr, sizeof(reuseaddr));
   if (result < 0)
   {
     FREERTPS_ERROR("couldn't set SO_REUSEADDR on an rx sock\n");
     return false;
-  }
+  }*/
   struct sockaddr_in rx_bind_addr;
   memset(&rx_bind_addr, 0, sizeof(rx_bind_addr));
   rx_bind_addr.sin_family = AF_INET;
