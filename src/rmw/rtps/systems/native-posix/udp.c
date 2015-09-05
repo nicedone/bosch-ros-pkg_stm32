@@ -228,74 +228,34 @@ bool frudp_add_mcast_rx(in_addr_t group, uint16_t port) //,
 
 bool frudp_listen(const uint32_t max_usec)
 {
-  return true;
-  //printf("frudp_listen(%d)\n", (int)max_usec);
-  static uint8_t s_frudp_listen_buf[FU_RX_BUFSIZE]; // haha
-  double t_start = fr_time_now_double();
-  double t_now = t_start;
-  while (t_now - t_start <= 1.0e-6 * max_usec)
-  {
-    fd_set rdset;
-    FD_ZERO(&rdset);
-    int max_fd = 0;
+    os_printf("frudp_listen(%d)\n", (int)max_usec);
+    static uint8_t s_frudp_listen_buf[FU_RX_BUFSIZE]; // haha
+
     for (int i = 0; i < g_frudp_rx_socks_used; i++)
     {
-      const int s = g_frudp_rx_socks[i].sock;
-      FD_SET(s, &rdset);
-      if (s > max_fd)
-        max_fd = s;
-    }
-    double t_elapsed = t_now - t_start;
-    double t_remaining = (max_usec * 1.0e-6) - t_elapsed;
-    if (g_timer_period > 0)
-    {
-      double t_until_timeout = g_timer_last_t + g_timer_period - t_now;
-      if (t_until_timeout < 0)
-        t_remaining = 0;
-      else if (t_until_timeout < t_remaining)
-        t_remaining = t_until_timeout;
-    }
-    struct timeval timeout;
-    timeout.tv_sec = floor(t_remaining);// max_usec / 1000000;
-    timeout.tv_usec = (t_remaining - timeout.tv_sec) * 1000000;  /*max_usec - timeout.tv_sec * 1000000*/;
-    int rv = select(max_fd+1, &rdset, NULL, NULL, &timeout);
-    if (rv < 0)
-      return false; // badness
-    if (rv > 0)
-    {
-      // find out which of our rx socks had something exciting happen
-      for (int i = 0; i < g_frudp_rx_socks_used; i++)
+
+      frudp_rx_sock_t *rxs = &g_frudp_rx_socks[i];
+      //if (FD_ISSET(rxs->sock, &rdset))
       {
-        frudp_rx_sock_t *rxs = &g_frudp_rx_socks[i];
-        if (FD_ISSET(rxs->sock, &rdset))
-        {
-          struct sockaddr_in src_addr;
-          int addrlen = sizeof(src_addr);
-          int nbytes = recvfrom(rxs->sock,
-                                s_frudp_listen_buf, sizeof(s_frudp_listen_buf),
-                                0,
-                                (struct sockaddr *)&src_addr,
-                                (socklen_t *)&addrlen);
-          frudp_rx(src_addr.sin_addr.s_addr, src_addr.sin_port,
-                   rxs->addr, rxs->port,
-                   s_frudp_listen_buf, nbytes);
-        }
+        struct sockaddr_in src_addr;
+        int addrlen = sizeof(src_addr);
+
+        set_socket_timeout(rxs->sock, (int)(max_usec / 4000.0f));
+
+        int nbytes = recvfrom(rxs->sock,
+                              s_frudp_listen_buf, sizeof(s_frudp_listen_buf),
+                              0,
+                              (struct sockaddr *)&src_addr,
+                              (socklen_t *)&addrlen);
+        os_printf("received %d bytes\n", nbytes);
+
+        frudp_rx(src_addr.sin_addr.s_addr, src_addr.sin_port,
+                 rxs->addr, rxs->port,
+                 s_frudp_listen_buf, nbytes);
+
       }
     }
-    if (max_usec == 0) // this is a common case from, e.g., spin_some()
-      break;
-    t_now = fr_time_now_double();
-    if (g_timer_period > 0)
-    {
-      double t_until_timeout = g_timer_last_t + g_timer_period - t_now;
-      if (t_until_timeout <= 0)
-      {
-        g_timer_last_t = t_now;
-        g_timer_cb();
-      }
-    }
-  }
-  return true;
+    return true;
 }
 
 bool frudp_tx(const in_addr_t dst_addr,
