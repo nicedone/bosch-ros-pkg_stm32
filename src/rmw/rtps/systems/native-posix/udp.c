@@ -228,6 +228,7 @@ bool frudp_add_mcast_rx(in_addr_t group, uint16_t port) //,
 
 bool frudp_listen(const uint32_t max_usec)
 {
+  return true;
   //printf("frudp_listen(%d)\n", (int)max_usec);
   static uint8_t s_frudp_listen_buf[FU_RX_BUFSIZE]; // haha
   double t_start = fr_time_now_double();
@@ -303,6 +304,7 @@ bool frudp_tx(const in_addr_t dst_addr,
               const uint16_t tx_len)
 {
   //struct sockaddr_in g_freertps_tx_addr;
+  g_frudp_tx_addr.sin_family = AF_INET;
   g_frudp_tx_addr.sin_port = htons(dst_port);
   g_frudp_tx_addr.sin_addr.s_addr = dst_addr;
   // todo: be smarter
