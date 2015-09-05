@@ -57,35 +57,12 @@ bool frudp_init()
     //g_freertps_udp_rx_socks[i].cb = NULL;
   }
 
-  /*struct ifaddrs *ifaddr;
-  if (getifaddrs(&ifaddr) == -1)
-  {
-    FREERTPS_FATAL("couldn't call getifaddrs");
-    return false;
-  }
-  char *tx_addr_str = "127.0.0.1"; // use loopback if nothing else is found
-  for (struct ifaddrs *ifa = ifaddr; ifa; ifa = ifa->ifa_next)
-  {
-    if (!ifa->ifa_addr)
-      continue;
-    int family = ifa->ifa_addr->sa_family;
-    if (family != AF_INET)
-      continue;
-    char host[NI_MAXHOST];
-    if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in),
-                    host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST))
-      continue;
-    FREERTPS_INFO("found address %s on interface %s\n", host, ifa->ifa_name);
-    if (0 == strcmp(host, "127.0.0.1"))
-      continue; // boring
-    tx_addr_str = host; // save this one for now
-  }*/
+  char *tx_addr_str = THIS_REMOTE_IP; // use loopback if nothing else is found
 
-  char tx_addr_str[] = THIS_REMOTE_IP;
+
   FREERTPS_INFO("using address %s for unicast\n", tx_addr_str);
   g_frudp_tx_addr.sin_addr.s_addr = inet_addr(tx_addr_str);
   g_frudp_config.unicast_addr = (uint32_t)g_frudp_tx_addr.sin_addr.s_addr;
-  //freeifaddrs(ifaddr);
 
   g_frudp_tx_sock = socket(AF_INET, SOCK_DGRAM, 0);
   if (g_frudp_tx_sock < 0)
@@ -206,13 +183,13 @@ bool frudp_add_mcast_rx(in_addr_t group, uint16_t port) //,
   if (s < 0)
     return false;
   int result = 0, reuseaddr = 1;
-  /*result = setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
+  result = setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
                       &reuseaddr, sizeof(reuseaddr));
   if (result < 0)
   {
     FREERTPS_ERROR("couldn't set SO_REUSEADDR on an rx sock\n");
     return false;
-  }*/
+  }
   struct sockaddr_in rx_bind_addr;
   memset(&rx_bind_addr, 0, sizeof(rx_bind_addr));
   rx_bind_addr.sin_family = AF_INET;
@@ -244,40 +221,11 @@ bool frudp_add_mcast_rx(in_addr_t group, uint16_t port) //,
   g_frudp_rx_socks_used++;
   return true;
 }
-extern void set_socket_timeout(int s, int timeout);
 
 bool frudp_listen(const uint32_t max_usec)
 {
   //printf("frudp_listen(%d)\n", (int)max_usec);
   static uint8_t s_frudp_listen_buf[FU_RX_BUFSIZE]; // haha
-
-  //for (int i = 0; i < g_frudp_rx_socks_used; i++)
-  {
-
-    frudp_rx_sock_t *rxs = &g_frudp_rx_socks[0];
-    //if (FD_ISSET(rxs->sock, &rdset))
-    {
-      struct sockaddr_in src_addr;
-      int addrlen = sizeof(src_addr);
-
-      set_socket_timeout(rxs->sock, 500);
-
-      int nbytes = recvfrom(rxs->sock,
-                            s_frudp_listen_buf, sizeof(s_frudp_listen_buf),
-                            0,
-                            (struct sockaddr *)&src_addr,
-                            (socklen_t *)&addrlen);
-      os_printf("received %d bytes\n", nbytes);
-
-      frudp_rx(src_addr.sin_addr.s_addr, src_addr.sin_port,
-               rxs->addr, rxs->port,
-               s_frudp_listen_buf, nbytes);
-
-    }
-  }
-  return true;
-
-
   double t_start = fr_time_now_double();
   double t_now = t_start;
   while (t_now - t_start <= 1.0e-6 * max_usec)
@@ -351,11 +299,10 @@ bool frudp_tx(const in_addr_t dst_addr,
               const uint16_t tx_len)
 {
   //struct sockaddr_in g_freertps_tx_addr;
-  g_frudp_tx_addr.sin_family = AF_INET;
   g_frudp_tx_addr.sin_port = htons(dst_port);
   g_frudp_tx_addr.sin_addr.s_addr = dst_addr;
   // todo: be smarter
-  if (tx_len == sendto(g_frudp_rx_socks[0].sock, tx_data, tx_len, 0,
+  if (tx_len == sendto(g_frudp_rx_socks[3].sock, tx_data, tx_len, 0,
                        (struct sockaddr *)(&g_frudp_tx_addr),
                        sizeof(g_frudp_tx_addr)))
     return true;
