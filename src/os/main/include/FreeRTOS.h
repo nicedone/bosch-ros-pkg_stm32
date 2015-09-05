@@ -87,7 +87,7 @@
 conform. */
 typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 
-#define DEADLINE_SCHEDULING
+//#define DEADLINE_SCHEDULING
 
 #ifdef DEADLINE_SCHEDULING
 #define DEADLINE_PRIORITY configMAX_PRIORITIES - 1

@@ -30,6 +30,8 @@
  * allocation and deallocation.
  */
 #define SYS_LIGHTWEIGHT_PROT    0
+#define LWIP_IGMP 1
+#define LWIP_SO_RCVTIMEO 1
 
 #define ETHARP_TRUST_IP_MAC     0
 #define IP_REASSEMBLY           0
@@ -58,7 +60,7 @@ a lot of data that needs to be copied, this should be set high. */
 #define MEMP_NUM_PBUF           100
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
-#define MEMP_NUM_UDP_PCB        6
+#define MEMP_NUM_UDP_PCB        10
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
    connections. */
 #define MEMP_NUM_TCP_PCB        10
@@ -75,16 +77,16 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* ---------- Pbuf options ---------- */
 /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
-#define PBUF_POOL_SIZE          20
+#define PBUF_POOL_SIZE          8
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
-#define PBUF_POOL_BUFSIZE       1000
+#define PBUF_POOL_BUFSIZE      500
 
 /**
  * MEMP_NUM_NETCONN: the number of struct netconns.
  * (only needed if you use the sequential API, like api_lib.c)
  */
-#define MEMP_NUM_NETCONN 10
+#define MEMP_NUM_NETCONN 12
 
 
 /* ---------- TCP options ---------- */

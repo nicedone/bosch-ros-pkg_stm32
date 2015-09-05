@@ -93,5 +93,8 @@ void abort(void)
   /* Abort called */
   while(1);
 }
+
+int _kill(__attribute__((unused)) int pid,
+          __attribute__((unused)) int sig) { return -1; }
           
 /* --------------------------------- End Of File ------------------------------ */

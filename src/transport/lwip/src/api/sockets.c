@@ -206,6 +206,12 @@ get_socket(int s)
   return sock;
 }
 
+void set_socket_timeout(int s, int timeout)
+{
+    struct lwip_socket *sock = get_socket(s);
+    sock->conn->recv_timeout= timeout;
+}
+
 /**
  * Allocate a new socket for a given netconn.
  *
