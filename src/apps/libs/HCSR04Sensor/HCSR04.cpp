@@ -92,7 +92,7 @@ float HCSR04::ping()
 	return distance;
 }
 
-
+// Source: NewPing Lib Arduino
 #define PING_MEDIAN_PERIOD 40
 float HCSR04::pingMedian(uint8_t it) {
 	float uS[it], last;

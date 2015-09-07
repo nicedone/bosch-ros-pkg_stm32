@@ -73,8 +73,6 @@ void TerminalTask(void* params)
                     netconn_send(conn, buf);
                     netbuf_delete(buf); // Deallocate packet buffer
                 }
-                else
-                    os_printf("Netbuf_alloc: Cannot allocate memory!\n");
 			}
 	}
 }
@@ -99,7 +97,7 @@ void os_printf(const char* fmt, ...)
 
     if (terminalQueue != NULL)
     {
-    	xQueueSend(terminalQueue, &string, 0);
+       xQueueSend(terminalQueue, &string, 0);
     }
     /*
     taskDISABLE_INTERRUPTS();

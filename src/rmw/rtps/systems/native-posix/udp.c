@@ -15,7 +15,6 @@
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include "device_config.h"
-#include "lwip/ip.h"
 
 #define in_addr_t uint32_t
 #define in_port_t uint16_t
@@ -71,8 +70,6 @@ bool frudp_init()
     FREERTPS_FATAL("couldn't create tx sock\n");
     return false;
   }
-
-  netif_list->flags |= NETIF_FLAG_IGMP;
 
   int result;
   result = setsockopt(g_frudp_tx_sock, IPPROTO_IP, IP_MULTICAST_IF,
@@ -228,7 +225,6 @@ bool frudp_add_mcast_rx(in_addr_t group, uint16_t port) //,
 
 bool frudp_listen(const uint32_t max_usec)
 {
-    os_printf("frudp_listen(%d)\n", (int)max_usec);
     static uint8_t s_frudp_listen_buf[FU_RX_BUFSIZE]; // haha
 
     for (int i = 0; i < g_frudp_rx_socks_used; i++)
@@ -247,11 +243,14 @@ bool frudp_listen(const uint32_t max_usec)
                               0,
                               (struct sockaddr *)&src_addr,
                               (socklen_t *)&addrlen);
-        os_printf("received %d bytes\n", nbytes);
+        if (nbytes > 0)
+        {
+            os_printf("received %d bytes\n", nbytes);
 
-        frudp_rx(src_addr.sin_addr.s_addr, src_addr.sin_port,
-                 rxs->addr, rxs->port,
-                 s_frudp_listen_buf, nbytes);
+            frudp_rx(src_addr.sin_addr.s_addr, src_addr.sin_port,
+                     rxs->addr, rxs->port,
+                     s_frudp_listen_buf, nbytes);
+        }
 
       }
     }
