@@ -147,46 +147,6 @@ void rmw_main(void*p)
 {
     //RMW::instance()->start();
     vTaskDelay(1000);
-    /*int s = socket(AF_INET, SOCK_DGRAM, 0);
-    if (s < 0)
-      os_printf("socket couldn't be created!\n");
-    else
-    {
-    struct sockaddr_in rx_bind_addr;
-    memset(&rx_bind_addr, 0, sizeof(rx_bind_addr));
-    rx_bind_addr.sin_family = AF_INET;
-    rx_bind_addr.sin_addr.s_addr = inet_addr("192.168.1.99");
-    rx_bind_addr.sin_port = htons(7400);
-    int result = bind(s, (struct sockaddr *)&rx_bind_addr, sizeof(rx_bind_addr));
-    if (result < 0)
-    {
-      os_printf("couldn't bind to unicast port %d\n", 7400);
-      close(s);
-    }
-    char tx_data[] = "test";
-    int tx_len = strlen(tx_data);
-
-    struct sockaddr_in tx_bind_addr;
-    memset(&tx_bind_addr, 0, sizeof(tx_bind_addr));
-    tx_bind_addr.sin_family = AF_INET;
-    tx_bind_addr.sin_addr.s_addr = inet_addr("239.255.0.1");
-    tx_bind_addr.sin_port = htons(7400);
-    os_printf("send!\n");
-
-    while(1)
-    {
-        vTaskDelay(1000);
-        sendto(s, tx_data, tx_len, 0,
-                               (struct sockaddr *)(&tx_bind_addr),
-                               sizeof(tx_bind_addr));
-        os_printf("Send %s\n", tx_data);
-    }
-
-
-
-    }*/
-
-
 
    talker_main(0, NULL);
 

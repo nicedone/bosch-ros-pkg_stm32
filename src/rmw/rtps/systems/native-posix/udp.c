@@ -137,6 +137,42 @@ void frudp_fini()
   }
 }
 
+
+static void frudp_listen_task(void* param)
+{
+    int i = *((int*)param);
+
+    uint8_t s_frudp_listen_buf[1150];
+
+    frudp_rx_sock_t *rxs = &g_frudp_rx_socks[i];
+    while(1)
+    {
+      struct sockaddr_in src_addr;
+      int addrlen = sizeof(src_addr);
+
+      //set_socket_timeout(rxs->sock, (int)(max_usec / 8000.0f));
+
+      int nbytes = recvfrom(rxs->sock,
+                            s_frudp_listen_buf, sizeof(s_frudp_listen_buf),
+                            0,
+                            (struct sockaddr *)&src_addr,
+                            (socklen_t *)&addrlen);
+      if (nbytes > 0)
+      {
+          printf("received %d bytes\n", nbytes);
+
+          // TODO: Check shared variables.
+          frudp_rx(src_addr.sin_addr.s_addr, src_addr.sin_port,
+                   rxs->addr, rxs->port,
+                   s_frudp_listen_buf, nbytes);
+      }
+    }
+
+    vTaskDelete(NULL);
+
+}
+
+
 static int frudp_create_sock()
 {
   if (g_frudp_rx_socks_used >= FRUDP_MAX_RX_SOCKS)
@@ -147,6 +183,12 @@ static int frudp_create_sock()
   int s = socket(AF_INET, SOCK_DGRAM, 0);
   if (s < 0)
     FREERTPS_ERROR("couldn't create socket");
+
+
+  int* num = os_malloc(sizeof(int));
+  *num = g_frudp_rx_socks_used;
+  xTaskCreate(frudp_listen_task, (const signed char*)"RMW", 1200, num, tskIDLE_PRIORITY + 2, NULL);
+
   return s;
 }
 
@@ -223,37 +265,10 @@ bool frudp_add_mcast_rx(in_addr_t group, uint16_t port) //,
   return true;
 }
 
+
+
 bool frudp_listen(const uint32_t max_usec)
 {
-    static uint8_t s_frudp_listen_buf[FU_RX_BUFSIZE]; // haha
-
-    for (int i = 0; i < g_frudp_rx_socks_used; i++)
-    {
-
-      frudp_rx_sock_t *rxs = &g_frudp_rx_socks[i];
-      //if (FD_ISSET(rxs->sock, &rdset))
-      {
-        struct sockaddr_in src_addr;
-        int addrlen = sizeof(src_addr);
-
-        set_socket_timeout(rxs->sock, (int)(max_usec / 8000.0f));
-
-        int nbytes = recvfrom(rxs->sock,
-                              s_frudp_listen_buf, sizeof(s_frudp_listen_buf),
-                              0,
-                              (struct sockaddr *)&src_addr,
-                              (socklen_t *)&addrlen);
-        if (nbytes > 0)
-        {
-            printf("received %d bytes\n", nbytes);
-
-            frudp_rx(src_addr.sin_addr.s_addr, src_addr.sin_port,
-                     rxs->addr, rxs->port,
-                     s_frudp_listen_buf, nbytes);
-        }
-
-      }
-    }
     return true;
 }
 

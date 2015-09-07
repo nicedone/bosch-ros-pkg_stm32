@@ -13,7 +13,7 @@ int talker_main(int argc, char **argv)
   frudp_disco_start();
   while (freertps_system_ok())
   {
-    frudp_listen(500000);
+    //frudp_listen(500000);
     frudp_disco_tick();
     char msg[256] = {0};
     snprintf(&msg[4], sizeof(msg) - 4, "Hello World: %d", pub_count++);
@@ -21,6 +21,7 @@ int talker_main(int argc, char **argv)
     *((uint32_t *)msg) = rtps_string_len;
     freertps_publish(pub, (uint8_t *)msg, rtps_string_len + 4);
     printf("sending: [%s]\n", &msg[4]);
+    vTaskDelay(1000);
   }
   frudp_fini();
   return 0;
