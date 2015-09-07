@@ -461,15 +461,9 @@ signed int fprintf(FILE *pStream, const char *pFormat, ...)
  */
 signed int printf(const char *pFormat, ...)
 {
-    va_list ap;
-    signed int result;
+    os_printf(pFormat);
 
-    /* Forward call to vprintf */
-    va_start(ap, pFormat);
-    result = vprintf(pFormat, ap);
-    va_end(ap);
-
-    return result;
+    return 0;
 }
 
 

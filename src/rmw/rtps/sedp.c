@@ -488,9 +488,10 @@ void sedp_publish_pub(frudp_pub_t *pub)
 
 void sedp_add_builtin_endpoints(frudp_part_t *part)
 {
-  printf("adding endpoints for ");
+  // TODO: This print causes crash.
+  /*printf("adding endpoints for ");
   frudp_print_guid_prefix(&part->guid_prefix);
-  printf("\n");
+  printf("\n");*/
 
   frudp_reader_t pub_reader; // this reads the remote peer's publications
   pub_reader.writer_guid = g_frudp_guid_unknown;

@@ -21,11 +21,11 @@ typedef void (*freertps_msg_cb_t)(const void *msg);
 
 // maybe make this smarter someday
 #define FREERTPS_INFO(...) \
-  do { os_printf("freertps INFO : "); os_printf(__VA_ARGS__); } while (0)
+  do { printf("freertps INFO : "); printf(__VA_ARGS__); } while (0)
 #define FREERTPS_ERROR(...) \
-  do { os_printf("freertps ERROR: "); os_printf(__VA_ARGS__); } while (0)
+  do { printf("freertps ERROR: "); printf(__VA_ARGS__); } while (0)
 #define FREERTPS_FATAL(...) \
-  do { os_printf("freertps FATAL: "); os_printf(__VA_ARGS__); } while (0)
+  do { printf("freertps FATAL: "); printf(__VA_ARGS__); } while (0)
 
 void freertps_create_sub(const char *topic_name,
                          const char *type_name,

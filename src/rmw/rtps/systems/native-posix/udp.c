@@ -236,7 +236,7 @@ bool frudp_listen(const uint32_t max_usec)
         struct sockaddr_in src_addr;
         int addrlen = sizeof(src_addr);
 
-        set_socket_timeout(rxs->sock, (int)(max_usec / 4000.0f));
+        set_socket_timeout(rxs->sock, (int)(max_usec / 8000.0f));
 
         int nbytes = recvfrom(rxs->sock,
                               s_frudp_listen_buf, sizeof(s_frudp_listen_buf),
@@ -245,7 +245,7 @@ bool frudp_listen(const uint32_t max_usec)
                               (socklen_t *)&addrlen);
         if (nbytes > 0)
         {
-            os_printf("received %d bytes\n", nbytes);
+            printf("received %d bytes\n", nbytes);
 
             frudp_rx(src_addr.sin_addr.s_addr, src_addr.sin_port,
                      rxs->addr, rxs->port,

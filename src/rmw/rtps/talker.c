@@ -8,7 +8,7 @@ int talker_main(int argc, char **argv)
   freertps_system_init();
   frudp_pub_t *pub = freertps_create_pub
                        ("chatter",
-                        "std_msgs::msg::dds_::String_");
+                        "std_interfaces::msg::dds_::String_");
   int pub_count = 0;
   frudp_disco_start();
   while (freertps_system_ok())
