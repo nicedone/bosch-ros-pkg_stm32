@@ -7,7 +7,8 @@ With this software, ROS developers do not have to know the complexities of the r
 
 The software includes two different scheduling schemes: priority and deadline. If deadline scheduling is enabled, application developers can assign deadlines to periodic tasks in order to make sure that they are completed before this deadline as long as the system is not overloaded. 
 
-WARNING: Completely experimental software!
+WARNING & DISCLAIMER: Completely experimental software! License statements in each file/directory should be read carefully. 
+In addition to these licenses, the LICENSE in the root directory applies, unless this LICENSE contradicts the original license.
 
 |           Layers          |
 | ---------------------------------| 
